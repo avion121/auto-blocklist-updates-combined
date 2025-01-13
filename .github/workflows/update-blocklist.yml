@@ -1,0 +1,44 @@
+name: Update Blocklist Daily
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # This means it will run once every day at midnight UTC
+  workflow_dispatch:  # This allows you to manually trigger the action if needed
+
+jobs:
+  update_blocklist:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Update Blocklist
+      run: |
+        # Combine all your blocklist sources here (fetch from raw URLs or merge lists)
+        echo "oisdbig" >> blocklist.txt
+        echo "easylist" >> blocklist.txt
+        echo "easyprivacy" >> blocklist.txt
+        echo "steven-black" >> blocklist.txt
+        echo "HaGeZi's Pro DNS Blocklist" >> blocklist.txt
+        echo "Fanboy anti newsletter" >> blocklist.txt
+        echo "fanboy mobile notification" >> blocklist.txt
+        echo "fanboy anti chat" >> blocklist.txt
+        echo "youtube anti shorts" >> blocklist.txt
+        echo "bypass paywall" >> blocklist.txt
+        echo "d3ward.github.io##.adbox.banner_ads.adsbox" >> blocklist.txt
+        echo "d3ward.github.io##.textads" >> blocklist.txt
+        echo "/pagead.js$domain=d3ward.github.io" >> blocklist.txt
+        echo "/widget/ads" >> blocklist.txt
+
+        # Optionally fetch additional blocklist files via curl or wget
+        # For example, downloading EasyList or EasyPrivacy from raw GitHub URLs:
+        curl -s https://raw.githubusercontent.com/easylist/easylist/master/easylist.txt >> blocklist.txt
+        curl -s https://raw.githubusercontent.com/easylist/easyprivacy/master/easyprivacy.txt >> blocklist.txt
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'actions@github.com'
+        git add blocklist.txt
+        git commit -m "Update blocklist"
+        git push
