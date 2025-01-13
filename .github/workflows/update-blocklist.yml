@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v2  # This checks out your code to the runner
 
     - name: Update Blocklist
       run: |
@@ -31,16 +31,13 @@ jobs:
         echo "/widget/ads" >> blocklist.txt
 
         # Optionally fetch additional blocklist files via curl or wget
-        # For example, downloading EasyList or EasyPrivacy from raw GitHub URLs:
         curl -s https://raw.githubusercontent.com/easylist/easylist/master/easylist.txt >> blocklist.txt
         curl -s https://raw.githubusercontent.com/easylist/easyprivacy/master/easyprivacy.txt >> blocklist.txt
 
     - name: Commit and push changes
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}  # Use the stored GitHub Token
       run: |
         git config --global user.name 'GitHub Actions'
         git config --global user.email 'actions@github.com'
         git add blocklist.txt
         git commit -m "Update blocklist"
-        git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git HEAD
+        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
