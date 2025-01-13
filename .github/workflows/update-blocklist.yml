@@ -38,6 +38,11 @@ jobs:
       run: |
         git config --global user.name 'GitHub Actions'
         git config --global user.email 'actions@github.com'
+
+        # Fetch the latest changes from the remote repository
+        git pull origin main --rebase  # Rebase to incorporate remote changes
+
+        # Add changes, commit, and push
         git add blocklist.txt
         git commit -m "Update blocklist"
         git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
