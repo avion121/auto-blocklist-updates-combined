@@ -34,15 +34,24 @@ jobs:
         curl -s https://raw.githubusercontent.com/easylist/easylist/master/easylist.txt >> blocklist.txt
         curl -s https://raw.githubusercontent.com/easylist/easyprivacy/master/easyprivacy.txt >> blocklist.txt
 
-    - name: Commit and push changes
+    - name: Commit changes
       run: |
         git config --global user.name 'GitHub Actions'
         git config --global user.email 'actions@github.com'
 
-        # Fetch the latest changes from the remote repository
-        git pull origin main --rebase  # Rebase to incorporate remote changes
-
-        # Add changes, commit, and push
+        # Add changes to git and commit them
         git add blocklist.txt
         git commit -m "Update blocklist"
+
+    - name: Fetch the latest changes from the remote repository
+      run: |
+        # Fetch latest changes from the remote repository
+        git fetch origin main
+
+    - name: Rebase and push changes
+      run: |
+        # Rebase local changes with remote to avoid conflicts
+        git rebase origin/main
+
+        # Push changes to the repository
         git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
