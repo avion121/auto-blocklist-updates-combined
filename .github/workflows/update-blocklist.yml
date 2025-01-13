@@ -8,13 +8,22 @@ on:
 jobs:
   update_blocklist:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2  # This checks out your code to the runner
 
+    - name: Fetch latest changes
+      run: |
+        # Fetch latest changes from the remote repository
+        git fetch origin main
+
     - name: Update Blocklist
       run: |
-        # Combine all your blocklist sources here (fetch from raw URLs or merge lists)
+        # Check if blocklist.txt exists, otherwise create it
+        touch blocklist.txt
+
+        # Append blocklists to blocklist.txt
         echo "oisdbig" >> blocklist.txt
         echo "easylist" >> blocklist.txt
         echo "easyprivacy" >> blocklist.txt
@@ -41,17 +50,12 @@ jobs:
 
         # Add changes to git and commit them
         git add blocklist.txt
-        git commit -m "Update blocklist"
-
-    - name: Fetch the latest changes from the remote repository
-      run: |
-        # Fetch latest changes from the remote repository
-        git fetch origin main
+        git commit -m "Update blocklist" || echo "No changes to commit"
 
     - name: Rebase and push changes
       run: |
         # Rebase local changes with remote to avoid conflicts
-        git rebase origin/main
+        git rebase origin/main || (echo "Rebase failed, aborting." && exit 1)
 
-        # Push changes to the repository
+        # Push changes to the repository if no conflict occurred
         git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
